@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ikhsan Project - Performance Mode</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Orbitron:wght@700&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --neon-blue: #00f2fe;
+            --neon-pink: #ff0050;
+        }
+
+        /* Menggunakan rendering-intent untuk performa */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-backface-visibility: hidden; }
+
+        body {
+            background-color: #050505;
+            color: #fff;
+            font-family: 'Rajdhani', 'Noto Color Emoji', sans-serif;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Judul & Watermark dibuat statis dan simple */
+        .header-title {
+            position: fixed; top: 20px; font-family: 'Orbitron';
+            font-size: 12px; color: var(--neon-blue); letter-spacing: 3px;
+        }
+
+        .watermark {
+            position: fixed; bottom: 20px; right: 20px;
+            font-size: 10px; opacity: 0.4; font-family: 'Orbitron';
+        }
+
+        /* Frame disederhanakan (Hapus blur & clip-path berat) */
+        .simple-frame {
+            position: relative;
+            width: 90vw; height: 30vh; max-width: 500px;
+            display: none; justify-content: center; align-items: center;
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            background: rgba(0, 0, 0, 0.5); /* Tanpa backdrop-filter blur */
+        }
+
+        .lyric-item {
+            position: absolute;
+            width: 90%; text-align: center;
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
+            font-weight: 800; opacity: 0;
+            text-transform: uppercase;
+            /* Optimasi GPU */
+            will-change: transform, opacity;
+        }
+
+        .emoji-box { font-family: 'Noto Color Emoji', sans-serif; display: block; margin-bottom: 5px; }
+
+        .btn-ui {
+            padding: 15px 35px; font-family: 'Orbitron';
+            background: #ff0050; color: #fff; border: none;
+            cursor: pointer; font-weight: bold;
+        }
+
+        /* Marquee ringan (Hapus border & shadow berlebih) */
+        .marquee {
+            position: fixed; width: 100%; bottom: 0;
+            font-size: 9px; color: #444; overflow: hidden; white-space: nowrap;
+        }
+        .marquee span { display: inline-block; animation: move 10s linear infinite; }
+        @keyframes move { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+    </style>
+</head>
+<body>
+
+    <div class="header-title">IKHSAN PROJECT SYSTEM</div>
+    <div class="watermark">© IKHSAN</div>
+
+    <button class="btn-ui" id="start-btn">START</button>
+
+    <div class="simple-frame" id="frame">
+        <div class="lyric-item" data-dur="2.0"><span class="emoji-box">??</span>Hidupmu marah-marah mulu</div>
+        <div class="lyric-item" data-dur="2.0"><span class="emoji-box">?</span>Buang-buang waktu</div>
+        <div class="lyric-item" data-dur="1.7"><span class="emoji-box">??</span>Mending nyanyi sama aku</div>
+        <div class="lyric-item" data-dur="3.75" style="color:var(--neon-pink)"><span class="emoji-box">??</span>EEEE A (ENGKOL!)</div>
+        <div class="lyric-item" data-dur="2.75" style="color:var(--neon-blue)"><span class="emoji-box">??</span>E E E E A</div>
+    </div>
+
+    <div class="marquee"><span>RUNNING TEXT IKHSAN PROJECT SYSTEM • PERFORMANCE MODE ACTIVE • </span></div>
+
+    <audio id="audio" src="lirik.mp3"></audio>
+
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const frame = document.getElementById('frame');
+        const audio = document.getElementById('audio');
+        const lyrics = document.querySelectorAll('.lyric-item');
+
+        startBtn.addEventListener('click', () => {
+            startBtn.style.display = 'none';
+            frame.style.display = 'flex';
+            audio.play();
+
+            const tl = gsap.timeline();
+            let currentTime = 0.2; 
+
+            lyrics.forEach((el, i) => {
+                const dur = parseFloat(el.getAttribute('data-dur'));
+                
+                // Transisi Sederhana (Hanya geser & fade) - Lebih ringan untuk CPU
+                tl.fromTo(el, 
+                    { opacity: 0, y: 20 }, 
+                    { opacity: 1, y: 0, duration: 0.4, ease: "power1.out" }, 
+                    currentTime
+                );
+
+                tl.to(el, { 
+                    opacity: 0, y: -20, duration: 0.3, ease: "power1.in" 
+                }, currentTime + dur);
+
+                currentTime += (dur + 0.1); 
+            });
+
+            tl.eventCallback("onComplete", () => {
+                audio.pause();
+                location.reload(); // Langsung reload untuk reset memori
+            });
+        });
+    </script>
+</body>
+</html>
