@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cetak Struk Thermal - Super Bold Edition</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        :root {
+            --struk-width: 175px;
+            --font-toko: 14px;
+            --font-normal: 11px;
+            --font-total: 13px;
+            --weight-heavy: 900;
+        }
+        
+        body {
+            background: #f4f7f6;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+
+        .test-container { max-width: 500px; margin: 0 auto; }
+        .preview-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .preview-header { background: #333; color: white; padding: 15px; text-align: center; }
+        .preview-body { padding: 20px; }
+
+        /* Style Preview di Layar */
+        .struk-preview {
+            width: var(--struk-width);
+            margin: 0 auto;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .preview-content .nama-toko { font-size: var(--font-toko); font-weight: bold; text-align: center; }
+        .preview-content .item-row { margin: 5px 0; font-size: var(--font-normal); }
+        .preview-content .divider { border-top: 1px dashed #000; margin: 5px 0; }
+
+        .btn-print { width: 100%; padding: 12px; font-weight: bold; border-radius: 8px; margin-top: 10px; }
+        
+        /* Area Cetak disembunyikan dari layar */
+        #print-area { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="test-container">
+    <div class="preview-card">
+        <div class="preview-header">
+            <h5><i class="fas fa-print"></i> Thermal Print Optimizer</h5>
+        </div>
+        <div class="preview-body">
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Nama Toko</label>
+                <input type="text" id="namaToko" class="form-control" value="TOKO BERKAH JAYA">
+            </div>
+            
+            <div id="strukPreview" class="struk-preview">
+                </div>
+
+            <button class="btn btn-dark btn-print" onclick="cetakUSB()">
+                <i class="fas fa-bolt"></i> CETAK SUPER TEBAL (USB)
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function formatRupiah(angka) {
+        return (parseInt(angka) || 0).toLocaleString('id-ID');
+    }
+
+    function generateHtmlStruk() {
+        const toko = document.getElementById('namaToko').value;
+        const now = new Date().toLocaleString('id-ID');
+        
+        return `
+            <div class="print-header">
+                <div class="print-nama-toko">${toko}</div>
+                <div class="print-alamat">Jl. Raya Pesona Gading No. 123</div>
+            </div>
+            <div class="print-divider">---------------------------</div>
+            <div class="print-info-row">
+                <span>Tgl: ${now}</span>
+            </div>
+            <div class="print-divider">---------------------------</div>
+            <div class="print-item-row">
+                <div class="print-item-name">CONTOH BARANG TEBAL</div>
+                <div class="print-item-detail">
+                    <span>1 x 50.000</span>
+                    <span>50.000</span>
+                </div>
+            </div>
+            <div class="print-divider">---------------------------</div>
+            <div class="print-total-row">
+                <span>TOTAL :</span>
+                <span>Rp 50.000</span>
+            </div>
+            <div class="print-footer">
+                <div class="print-thanks">*** TERIMA KASIH ***</div>
+            </div>
+        `;
+    }
+
+    function refreshPreview() {
+        document.getElementById('strukPreview').innerHTML = generateHtmlStruk();
+    }
+
+    function cetakUSB() {
+        Swal.fire({
+            title: 'Konfirmasi Cetak',
+            text: "Pastikan Printer Thermal sudah menyala",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#333',
+            confirmButtonText: 'Cetak Sekarang'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                executePrint();
+            }
+        });
+    }
+
+    function executePrint() {
+        const printWindow = window.open('', '_blank');
+        const isiStruk = generateHtmlStruk();
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <style>
+                    /* Reset & Base Setting */
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { 
+                        background: white; 
+                        color: black;
+                    }
+                    
+                    /* TRICK UTAMA: TEXT SHADOW & STROKE
+                       Ini akan memaksa printer membakar area lebih tebal */
+                    .struk-print {
+                        width: 170px; /* Lebar optimal 58mm browser */
+                        margin: 0;
+                        padding: 2px;
+                        font-family: 'Courier New', Courier, monospace;
+                        /* Membuat semua teks di dalam struk menjadi tebal maksimal */
+                        text-shadow: 0.3px 0 0 #000, 0 0.3px 0 #000;
+                        -webkit-text-stroke: 0.3px black;
+                    }
+
+                    .print-header { text-align: center; margin-bottom: 5px; }
+
+                    /* Nama Toko Dibuat Paling Menonjol */
+                    .print-nama-toko { 
+                        font-size: 18px; 
+                        font-weight: 900; 
+                        text-transform: uppercase;
+                        margin-bottom: 2px;
+                        letter-spacing: 1px;
+                        /* Double stroke untuk nama toko */
+                        -webkit-text-stroke: 0.8px black;
+                    }
+
+                    .print-alamat { font-size: 11px; font-weight: 700; }
+                    .print-divider { font-size: 10px; margin: 5px 0; font-weight: 900; }
+
+                    .print-info-row { font-size: 11px; font-weight: 800; margin-bottom: 2px; }
+
+                    .print-item-row { margin-bottom: 5px; }
+                    .print-item-name { font-size: 12px; font-weight: 900; text-transform: uppercase; }
+                    
+                    .print-item-detail { 
+                        display: flex; 
+                        justify-content: space-between; 
+                        font-size: 11px; 
+                        font-weight: 800;
+                    }
+
+                    .print-total-row { 
+                        display: flex; 
+                        justify-content: space-between; 
+                        font-size: 15px; 
+                        font-weight: 900; 
+                        margin: 10px 0;
+                        border-top: 1px solid #000;
+                        padding-top: 5px;
+                    }
+
+                    .print-footer { text-align: center; margin-top: 15px; }
+                    .print-thanks { font-size: 12px; font-weight: 900; }
+
+                    /* Hilangkan Header/Footer Browser (Tanggal & URL di kertas) */
+                    @page { 
+                        size: 58mm auto; 
+                        margin: 0mm; 
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="struk-print">
+                    ${isiStruk}
+                </div>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        setTimeout(() => { window.close(); }, 500);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    // Inisialisasi
+    document.getElementById('namaToko').addEventListener('input', refreshPreview);
+    window.onload = refreshPreview;
+</script>
+
+</body>
+</html>
