@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Ikhsan | Neo Member System</title>
+    <style>
+        /* CSS Reset & Base - Kompatibel semua browser (2005-2026) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Inter', 'Rajdhani', 'Arial', sans-serif;
+            background: #0a0c15;
+            color: #eef5ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Glassmorphism dengan fallback */
+        .glass-card {
+            background: rgba(10, 18, 28, 0.85);
+            border: 1px solid rgba(0, 255, 200, 0.25);
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Fallback untuk browser lama */
+        .card-solid {
+            background: #0e1622;
+            border: 1px solid #2a6f8f;
+            border-radius: 24px;
+        }
+        
+        .neon-input {
+            background: #0f1622;
+            border: 1px solid #2a5a6a;
+            border-radius: 40px;
+            padding: 12px 18px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        
+        .neon-input:focus {
+            border-color: #0ff0c0;
+            outline: none;
+            box-shadow: 0 0 8px rgba(0, 255, 200, 0.3);
+        }
+        
+        .btn-neon {
+            background: linear-gradient(135deg, #0c2a38, #06121c);
+            border: 1px solid #1cc6ff80;
+            border-radius: 40px;
+            padding: 10px 24px;
+            color: #ccf7ff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .btn-neon:hover {
+            border-color: #0ff0c0;
+            box-shadow: 0 0 12px rgba(0, 255, 200, 0.4);
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #4a1a2a, #2a0a1a);
+            border-color: #ff6b8b;
+        }
+        
+        .btn-danger:hover {
+            border-color: #ff8baa;
+        }
+        
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 12px;
+        }
+        
+        .menu-bar {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(0, 255, 200, 0.3);
+            margin-bottom: 24px;
+            padding-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .menu-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            border-radius: 30px;
+            background: transparent;
+        }
+        
+        .menu-item:hover {
+            color: #0ff0c0;
+            background: rgba(0, 255, 200, 0.1);
+        }
+        
+        .menu-active {
+            border-bottom: 3px solid #0ff0c0;
+            color: #0ff0c0;
+            background: rgba(0, 255, 200, 0.05);
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 255, 200, 0.3);
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #0ff0c0, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .clock {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-family: monospace;
+            font-size: 20px;
+            border: 1px solid #0ff0c080;
+        }
+        
+        /* Panel */
+        .panel {
+            display: none;
+        }
+        
+        .panel.active {
+            display: block;
+        }
+        
+        /* Grid */
+        .grid-2 {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .grid-2 > div {
+            flex: 1;
+            min-width: 280px;
+        }
+        
+        /* Member Card */
+        .member-card {
+            background: rgba(15, 25, 35, 0.7);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #0ff0c0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-id {
+            font-family: monospace;
+            background: #0f2a2a;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            display: inline-block;
+            color: #0ff0c0;
+        }
+        
+        .member-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        
+        .member-stats {
+            font-size: 11px;
+            color: #88aaff;
+            margin-top: 4px;
+        }
+        
+        .member-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: #0e1a24;
+            border: 1px solid #0ff0c0;
+            border-radius: 28px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #0ff0c080;
+            padding-bottom: 12px;
+        }
+        
+        .close-btn {
+            cursor: pointer;
+            font-size: 28px;
+            color: #aaa;
+        }
+        
+        .close-btn:hover {
+            color: #fff;
+        }
+        
+        .total-belanja {
+            background: linear-gradient(135deg, #0a2a2f, #051218);
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            text-align: center;
+            border: 1px solid #0ff0c080;
+        }
+        
+        .total-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0ff0c0;
+        }
+        
+        .history-item {
+            background: #0a1420;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid #0ff0c0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .toast-notif {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a1a24;
+            border-left: 4px solid #0ff0c0;
+            padding: 12px 28px;
+            border-radius: 50px;
+            z-index: 3000;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .toast-notif.show {
+            opacity: 1;
+        }
+        
+        .fab-reset {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+            z-index: 500;
+        }
+        
+        .fab-reset:hover {
+            transform: scale(1.08);
+        }
+        
+        input, button {
+            font-family: inherit;
+        }
+        
+        .search-status {
+            font-size: 12px;
+            margin-top: 6px;
+            color: #0ff0c0;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .member-card { flex-direction: column; align-items: flex-start; }
+            .member-actions { width: 100%; justify-content: flex-end; }
+            .toast-notif { white-space: normal; text-align: center; width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🏪 TOKO IKHSAN | <span style="font-size:14px;">MEMBER NEO</span></div>
+            <div class="clock" id="liveClock">--:--:--</div>
+        </div>
+        
+        <!-- Menu Bar -->
+        <div class="menu-bar">
+            <div class="menu-item menu-active" data-menu="dashboard">📊 DASHBOARD</div>
+            <div class="menu-item" data-menu="members">👥 MANAJEMEN</div>
+            <div class="menu-item" data-menu="history">📜 RIWAYAT GLOBAL</div>
+        </div>
+        
+        <!-- Panel Dashboard -->
+        <div id="dashboardPanel" class="panel active">
+            <div class="glass-card" style="padding: 24px;">
+                <div class="grid-2">
+                    <div>
+                        <label style="color: #0ff0c0; font-weight: bold;">🔍 CARI MEMBER (Exact Match)</label>
+                        <input type="text" id="searchInput" class="neon-input" placeholder="Nama atau Kode Member (contoh: TI000001 / Ikhsan)" style="margin-top: 8px;">
+                        <div id="searchStatus" class="search-status"></div>
+                        
+                        <div id="selectedCard" style="display: none; margin-top: 20px; background: rgba(0,255,200,0.1); border-radius: 20px; padding: 16px; border-left: 4px solid #0ff0c0;">
+                            <div style="color: #0ff0c0; font-size: 12px;">MEMBER TERPILIH</div>
+                            <div id="selectedName" style="font-size: 24px; font-weight: bold;"></div>
+                            <div id="selectedCode" style="font-family: monospace;"></div>
+                        </div>
+                        
+                        <div style="margin-top: 24px;">
+                            <label style="color: #0ff0c0; font-weight: bold;">💰 NOMINAL TRANSAKSI (Rp)</label>
+                            <input type="text" id="nominalInput" class="neon-input" placeholder="0" style="margin-top: 8px;">
+                        </div>
+                        
+                        <button id="simpanBtn" class="btn-neon" style="width: 100%; margin-top: 20px; padding: 14px;"><i>💾</i> SIMPAN (F7 / Enter)</button>
+                    </div>
+                    <div>
+                        <div class="glass-card" style="padding: 20px;">
+                            <h3 style="color: #0ff0c0;">📊 STATISTIK</h3>
+                            <div style="margin-top: 12px;">Total Member: <span id="totalMember" style="color: #0ff0c0; font-size: 24px; font-weight: bold;">0</span></div>
+                            <div>Total Transaksi: <span id="totalTrans" style="color: #0ff0c0; font-size: 20px; font-weight: bold;">0</span></div>
+                        </div>
+                        <div class="glass-card" style="padding: 20px; margin-top: 16px;">
+                            <h3 style="color: #0ff0c0;">⌨️ SHORTCUT</h3>
+                            <div style="font-size: 12px; margin-top: 8px;">F2/F3/F4 : Ganti Menu</div>
+                            <div style="font-size: 12px;">F5 : Fokus Search | F6 : Fokus Nominal</div>
+                            <div style="font-size: 12px;">F7 / Enter : Simpan Transaksi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel Manajemen Member -->
+        <div id="membersPanel" class="panel">
+            <div class="glass-card" style="padding: 24px;">
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid #0ff0c080; padding-bottom: 16px;">
+                    <h2 style="color: #0ff0c0;">👥 DAFTAR MEMBER</h2>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="newMemberName" class="neon-input" placeholder="Nama Member Baru" style="width: 200px;">
+                        <button id="tambahMemberBtn" class="btn-neon">+ TAMBAH</button>
+                    </div>
+                </div>
+                <div id="memberListContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Panel Riwayat Global -->
+        <div id="historyPanel" class="panel">
+            <div class="glass-card" style="padding: 24px;">
+                <h2 style="color: #0ff0c0; margin-bottom: 16px;">📋 PILIH MEMBER LIHAT RIWAYAT</h2>
+                <input type="text" id="globalFilter" class="neon-input" placeholder="Cari member (nama/kode)" style="margin-bottom: 20px;">
+                <div id="memberHistoryList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Riwayat Member -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="color: #0ff0c0;">📜 RIWAYAT TRANSAKSI</h3>
+            <span class="close-btn" id="closeModalBtn">&times;</span>
+            </div>
+            <div id="modalMemberInfo" style="background: #0a1420; padding: 8px 12px; border-radius: 12px; margin-bottom: 12px;"></div>
+            <div class="total-belanja">
+                <div style="font-size: 12px;">TOTAL BELANJA</div>
+                <div id="totalBelanja" class="total-amount">Rp 0</div>
+            </div>
+            <input type="text" id="filterHistoryInput" class="neon-input" placeholder="Cari (tanggal / nominal)" style="margin: 12px 0;">
+            <div id="historyModalList" style="max-height: 400px; overflow-y: auto;"></div>
+            <div style="font-size: 11px; color: #888; margin-top: 12px; text-align: center;">* Hapus transaksi konfirmasi 2x (tanpa Enter)</div>
+        </div>
+    </div>
+    
+    <!-- Edit Member Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="color: #0ff0c0;">✏️ EDIT NAMA MEMBER</h3>
+                <span class="close-btn" id="closeEditModalBtn">&times;</span>
+            </div>
+            <div id="editMemberInfo" style="margin-bottom: 16px;"></div>
+            <input type="text" id="editMemberName" class="neon-input" placeholder="Nama baru" style="margin-bottom: 16px;">
+            <button id="saveEditBtn" class="btn-neon" style="width: 100%;">SIMPAN PERUBAHAN</button>
+        </div>
+    </div>
+    
+    <!-- Toast Notifikasi -->
+    <div id="toastNotif" class="toast-notif">Notifikasi</div>
+    
+    <!-- FAB Reset Transaksi -->
+    <div id="resetFab" class="fab-reset" title="Reset Semua Riwayat Transaksi (Member tetap)">
+        <span style="color: white; font-size: 24px;">🗑️</span>
+    </div>
+    
+    <script>
+        // ==================== DATA STORE ====================
+        let members = [];
+        
+        // Helper functions
+        function saveToLocal() {
+            localStorage.setItem("toko_ikhsan_members_final", JSON.stringify(members));
+        }
+        
+        function loadFromLocal() {
+            const stored = localStorage.getItem("toko_ikhsan_members_final");
+            if(stored) {
+                members = JSON.parse(stored);
+            } else {
+                members = [
+                    { id: "TI000001", name: "Ikhsan", transactions: [{ dateTime: getCurrentDateTime(), nominal: 50000 }, { dateTime: getCurrentDateTime(), nominal: 75000 }] },
+                    { id: "TI000002", name: "Budi Santoso", transactions: [{ dateTime: getCurrentDateTime(), nominal: 25000 }] },
+                    { id: "TI000003", name: "Siti Nurhaliza", transactions: [] }
+                ];
+                saveToLocal();
+            }
+        }
+        
+        function getCurrentDateTime() {
+            const now = new Date();
+            const tahun = now.getFullYear();
+            const bulan = String(now.getMonth() + 1).padStart(2,'0');
+            const tgl = String(now.getDate()).padStart(2,'0');
+            const jam = String(now.getHours()).padStart(2,'0');
+            const menit = String(now.getMinutes()).padStart(2,'0');
+            const detik = String(now.getSeconds()).padStart(2,'0');
+            return `${tahun}-${bulan}-${tgl} ${jam}:${menit}:${detik}`;
+        }
+        
+        function formatTanggal(dateTimeStr) {
+            if(!dateTimeStr) return "";
+            const parts = dateTimeStr.split(' ');
+            const datePart = parts[0];
+            const [year, month, day] = datePart.split('-');
+            const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            return `${parseInt(day)} ${bulanIndo[parseInt(month)-1]} ${year}`;
+        }
+        
+        // Auto generate ID yang melengkapi nomor kosong (1-...)
+        function getNextAvailableId() {
+            let existingNums = [];
+            for(let m of members) {
+                let num = parseInt(m.id.substring(2));
+                if(!isNaN(num)) existingNums.push(num);
+            }
+            existingNums.sort((a,b) => a-b);
+            let nextNum = 1;
+            for(let i = 0; i < existingNums.length; i++) {
+                if(existingNums[i] === nextNum) {
+                    nextNum++;
+                } else if(existingNums[i] > nextNum) {
+                    break;
+                }
+            }
+            return `TI${String(nextNum).padStart(6, '0')}`;
+        }
+        
+        function addMember(name) {
+            if(!name.trim()) return false;
+            const newId = getNextAvailableId();
+            members.push({ id: newId, name: name.trim(), transactions: [] });
+            saveToLocal();
+            refreshAllUI();
+            showToast(`✅ Member "${name}" ditambahkan! ID: ${newId}`);
+            return true;
+        }
+        
+        function updateMemberName(memberId, newName) {
+            const member = members.find(m => m.id === memberId);
+            if(member && newName.trim()) {
+                member.name = newName.trim();
+                saveToLocal();
+                refreshAllUI();
+                showToast(`✏️ Nama member diubah menjadi "${newName.trim()}"`);
+                return true;
+            }
+            return false;
+        }
+        
+        function deleteMemberById(memberId) {
+            members = members.filter(m => m.id !== memberId);
+            saveToLocal();
+            refreshAllUI();
+            if(window.currentSelectedMember && window.currentSelectedMember.id === memberId) clearSelected();
+            showToast(`🗑️ Member dihapus`);
+        }
+        
+        function addTransaction(memberId, nominal) {
+            const member = members.find(m => m.id === memberId);
+            if(!member) return false;
+            if(!nominal || nominal <= 0) return false;
+            member.transactions.push({ dateTime: getCurrentDateTime(), nominal: Number(nominal) });
+            saveToLocal();
+            refreshAllUI();
+            showToast(`✅ Transaksi Rp ${Number(nominal).toLocaleString()} untuk ${member.name} tersimpan!`);
+            return true;
+        }
+        
+        function deleteTransaction(memberId, transactionIndex) {
+            const member = members.find(m => m.id === memberId);
+            if(member && member.transactions[transactionIndex]) {
+                member.transactions.splice(transactionIndex, 1);
+                saveToLocal();
+                refreshAllUI();
+                showToast("🗑️ Transaksi dihapus");
+                return true;
+            }
+            return false;
+        }
+        
+        function resetAllTransactions() {
+            if(confirm("⚠️ PERINGATAN: Semua riwayat transaksi akan DIHAPUS PERMANEN!\nMember tetap ada. Lanjutkan? (1/2)")) {
+                if(confirm("⚠️ KONFIRMASI TERAKHIR: Yakin hapus SEMUA transaksi semua member? TIDAK BISA DIBATALKAN! (2/2)")) {
+                    members = members.map(m => ({ ...m, transactions: [] }));
+                    saveToLocal();
+                    refreshAllUI();
+                    showToast("✅ Semua riwayat transaksi telah direset!");
+                }
+            }
+        }
+        
+        function searchMemberExact(query) {
+            if(!query.trim()) return null;
+            const q = query.trim().toLowerCase();
+            return members.find(m => m.name.toLowerCase() === q || m.id.toLowerCase() === q);
+        }
+        
+        let currentSelectedMember = null;
+        function clearSelected() {
+            currentSelectedMember = null;
+            document.getElementById("selectedCard").style.display = "none";
+        }
+        
+        function renderSelected(member) {
+            currentSelectedMember = member;
+            document.getElementById("selectedName").innerHTML = escapeHtml(member.name);
+            document.getElementById("selectedCode").innerHTML = member.id;
+            document.getElementById("selectedCard").style.display = "block";
+        }
+        
+        // Render member list di manajemen
+        function renderMemberManagement() {
+            const container = document.getElementById("memberListContainer");
+            if(!container) return;
+            if(members.length === 0) {
+                container.innerHTML = "<div style='text-align:center; padding:40px; color:#888;'>Belum ada member. Tambahkan member baru!</div>";
+                return;
+            }
+            let html = "";
+            for(let i = 0; i < members.length; i++) {
+                const m = members[i];
+                const totalTrans = m.transactions.length;
+                html += `
+                    <div class="member-card">
+                        <div class="member-info">
+                            <span class="member-id">${m.id}</span>
+                            <div class="member-name">${escapeHtml(m.name)}</div>
+                            <div class="member-stats">📊 ${totalTrans} transaksi</div>
+                        </div>
+                        <div class="member-actions">
+                            <button class="btn-neon btn-sm edit-member-btn" data-id="${m.id}"><i>✏️</i> Edit</button>
+                            <button class="btn-neon btn-danger btn-sm delete-member-btn" data-id="${m.id}"><i>🗑️</i> Hapus</button>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            
+            document.querySelectorAll(".delete-member-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const id = btn.getAttribute("data-id");
+                    if(confirm(`Hapus member ${id}? Semua riwayat akan hilang.`)) {
+                        deleteMemberById(id);
+                    }
+                });
+            });
+            
+            document.querySelectorAll(".edit-member-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const id = btn.getAttribute("data-id");
+                    const member = members.find(m => m.id === id);
+                    if(member) openEditModal(member);
+                });
+            });
+        }
+        
+        // Render member list di riwayat global
+        function renderMemberHistoryList(filter = "") {
+            const container = document.getElementById("memberHistoryList");
+            let filtered = members.filter(m => m.name.toLowerCase().includes(filter.toLowerCase()) || m.id.toLowerCase().includes(filter.toLowerCase()));
+            if(filtered.length === 0) {
+                container.innerHTML = "<div style='text-align:center; padding:20px; color:#888;'>Tidak ada member</div>";
+                return;
+            }
+            let html = "";
+            for(let m of filtered) {
+                html += `
+                    <div class="member-card history-member" data-id="${m.id}" style="cursor:pointer;">
+                        <div class="member-info">
+                            <span class="member-id">${m.id}</span>
+                            <div class="member-name">${escapeHtml(m.name)}</div>
+                            <div class="member-stats">📊 ${m.transactions.length} transaksi</div>
+                        </div>
+                        <div><i class="arrow" style="color:#0ff0c0;">▶</i></div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            document.querySelectorAll(".history-member").forEach(el => {
+                el.addEventListener("click", () => {
+                    const id = el.getAttribute("data-id");
+                    const member = members.find(m => m.id === id);
+                    if(member) openHistoryModal(member);
+                });
+            });
+        }
+        
+        // Modal riwayat dengan total belanja
+        let currentModalMember = null;
+        function openHistoryModal(member) {
+            currentModalMember = member;
+            document.getElementById("modalMemberInfo").innerHTML = `<i>🆔</i> ${member.id} &nbsp;| <i>👤</i> ${escapeHtml(member.name)}`;
+            updateTotalBelanja(member);
+            filterAndRenderHistory(member, "");
+            document.getElementById("historyModal").classList.add("active");
+        }
+        
+        function updateTotalBelanja(member) {
+            const total = member.transactions.reduce((sum, t) => sum + t.nominal, 0);
+            document.getElementById("totalBelanja").innerHTML = `Rp ${total.toLocaleString()}`;
+        }
+        
+        function filterAndRenderHistory(member, filterText) {
+            let transactions = [...member.transactions];
+            if(filterText.trim()) {
+                const lower = filterText.toLowerCase();
+                transactions = transactions.filter(t => {
+                    const formattedDate = formatTanggal(t.dateTime);
+                    return t.dateTime.toLowerCase().includes(lower) || 
+                           formattedDate.toLowerCase().includes(lower) ||
+                           t.nominal.toString().includes(lower);
+                });
+            }
+            const container = document.getElementById("historyModalList");
+            if(transactions.length === 0) {
+                container.innerHTML = "<div style='text-align:center; padding:20px; color:#888;'>Tidak ada transaksi</div>";
+                return;
+            }
+            let html = "";
+            for(let i = 0; i < transactions.length; i++) {
+                const t = transactions[i];
+                const originalIdx = member.transactions.findIndex(orig => orig.dateTime === t.dateTime && orig.nominal === t.nominal);
+                const formattedDate = formatTanggal(t.dateTime);
+                const time = t.dateTime.split(' ')[1] || '';
+                html += `
+                    <div class="history-item">
+                        <div>
+                            <div style="color:#0ff0c0; font-size:12px;">${formattedDate} ${time}</div>
+                            <div style="font-size:18px; font-weight:bold;">Rp ${t.nominal.toLocaleString()}</div>
+                        </div>
+                        <button class="btn-neon btn-sm delete-trans-btn" data-idx="${originalIdx}" style="background:#4a1a2a;">🗑️ Hapus</button>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            
+            document.querySelectorAll(".delete-trans-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const idx = parseInt(btn.getAttribute("data-idx"));
+                    if(confirm("⚠️ Hapus transaksi ini? (Konfirmasi 1/2)")) {
+                        if(confirm("⚠️ KONFIRMASI TERAKHIR: Yakin hapus transaksi? (2/2)")) {
+                            deleteTransaction(currentModalMember.id, idx);
+                            const fresh = members.find(m => m.id === currentModalMember.id);
+                            if(fresh) {
+                                currentModalMember = fresh;
+                                updateTotalBelanja(fresh);
+                                filterAndRenderHistory(fresh, document.getElementById("filterHistoryInput").value);
+                                document.getElementById("modalMemberInfo").innerHTML = `<i>🆔</i> ${fresh.id} &nbsp;| <i>👤</i> ${escapeHtml(fresh.name)}`;
+                            } else {
+                                closeModals();
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Edit Modal
+        let editMemberTarget = null;
+        function openEditModal(member) {
+            editMemberTarget = member;
+            document.getElementById("editMemberInfo").innerHTML = `<span class="member-id">${member.id}</span><br><span style="font-size:18px;">${escapeHtml(member.name)}</span>`;
+            document.getElementById("editMemberName").value = member.name;
+            document.getElementById("editModal").classList.add("active");
+        }
+        
+        function saveEditMember() {
+            if(editMemberTarget) {
+                const newName = document.getElementById("editMemberName").value.trim();
+                if(newName) {
+                    updateMemberName(editMemberTarget.id, newName);
+                    closeModals();
+                } else {
+                    showToast("Nama tidak boleh kosong!", true);
+                }
+            }
+        }
+        
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById("toastNotif");
+            toast.innerHTML = msg;
+            toast.style.borderLeftColor = isError ? "#ff6b8b" : "#0ff0c0";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2200);
+        }
+        
+        function refreshAllUI() {
+            renderMemberManagement();
+            renderMemberHistoryList(document.getElementById("globalFilter")?.value || "");
+            const totalMember = members.length;
+            const totalTrans = members.reduce((acc, m) => acc + (m.transactions?.length || 0), 0);
+            document.getElementById("totalMember").innerHTML = totalMember;
+            document.getElementById("totalTrans").innerHTML = totalTrans;
+            if(currentSelectedMember) {
+                const found = members.find(m => m.id === currentSelectedMember.id);
+                if(found) renderSelected(found);
+                else clearSelected();
+            }
+        }
+        
+        function closeModals() {
+            document.getElementById("historyModal").classList.remove("active");
+            document.getElementById("editModal").classList.remove("active");
+            editMemberTarget = null;
+            currentModalMember = null;
+        }
+        
+        function escapeHtml(str) {
+            if(!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if(m === '&') return '&amp;';
+                if(m === '<') return '&lt;';
+                if(m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Menu Navigation
+        let currentMenu = "dashboard";
+        function showMenu(menu) {
+            document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+            document.getElementById(`${menu}Panel`).classList.add("active");
+            document.querySelectorAll(".menu-item").forEach(item => {
+                item.classList.remove("menu-active");
+                if(item.getAttribute("data-menu") === menu) item.classList.add("menu-active");
+            });
+            currentMenu = menu;
+            if(menu === "history") renderMemberHistoryList(document.getElementById("globalFilter").value);
+            if(menu === "members") renderMemberManagement();
+        }
+        
+        // Transaksi
+        function handleSimpanTransaksi() {
+            if(!currentSelectedMember) {
+                showToast("❌ Cari member terlebih dahulu (exact match)", true);
+                return;
+            }
+            let raw = document.getElementById("nominalInput").value;
+            let nominal = parseInt(raw.replace(/[^0-9]/g, ""));
+            if(isNaN(nominal) || nominal <= 0) {
+                showToast("❌ Nominal harus angka positif", true);
+                document.getElementById("nominalInput").focus();
+                return;
+            }
+            if(addTransaction(currentSelectedMember.id, nominal)) {
+                document.getElementById("searchInput").value = "";
+                document.getElementById("nominalInput").value = "";
+                document.getElementById("searchStatus").innerHTML = "";
+                clearSelected();
+                document.getElementById("searchInput").focus();
+            }
+        }
+        
+        // Format nominal otomatis
+        function formatNominalInput(e) {
+            let val = e.target.value.replace(/[^0-9]/g, "");
+            if(val) e.target.value = new Intl.NumberFormat('id-ID').format(parseInt(val));
+            else e.target.value = "";
+        }
+        
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById("liveClock").innerHTML = now.toLocaleTimeString('id-ID');
+        }
+        
+        // Event Listener
+        window.addEventListener("load", function() {
+            loadFromLocal();
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            document.getElementById("searchInput").addEventListener("input", function(e) {
+                const found = searchMemberExact(e.target.value);
+                if(found) {
+                    document.getElementById("searchStatus").innerHTML = `<span style="color:#0ff0c0;">✓ Ditemukan: ${found.name}</span>`;
+                    renderSelected(found);
+                } else {
+                    document.getElementById("searchStatus").innerHTML = e.target.value ? `<span style="color:#ff8888;">✗ Tidak cocok exact</span>` : "";
+                    clearSelected();
+                }
+            });
+            
+            document.getElementById("nominalInput").addEventListener("input", formatNominalInput);
+            document.getElementById("simpanBtn").addEventListener("click", handleSimpanTransaksi);
+            document.getElementById("tambahMemberBtn").addEventListener("click", function() {
+                const name = document.getElementById("newMemberName").value.trim();
+                if(name) addMember(name);
+                else showToast("Nama tidak boleh kosong", true);
+                document.getElementById("newMemberName").value = "";
+            });
+            document.getElementById("globalFilter").addEventListener("input", function(e) {
+                renderMemberHistoryList(e.target.value);
+            });
+            document.getElementById("closeModalBtn").addEventListener("click", closeModals);
+            document.getElementById("closeEditModalBtn").addEventListener("click", closeModals);
+            document.getElementById("saveEditBtn").addEventListener("click", saveEditMember);
+            document.getElementById("resetFab").addEventListener("click", resetAllTransactions);
+            document.getElementById("filterHistoryInput").addEventListener("input", function(e) {
+                if(currentModalMember) filterAndRenderHistory(currentModalMember, e.target.value);
+            });
+            
+            document.querySelectorAll(".menu-item").forEach(item => {
+                item.addEventListener("click", function() {
+                    showMenu(this.getAttribute("data-menu"));
+                });
+            });
+            
+            // Shortcuts
+            window.addEventListener("keydown", function(e) {
+                if(e.key === "F2") { e.preventDefault(); showMenu("dashboard"); }
+                if(e.key === "F3") { e.preventDefault(); showMenu("members"); }
+                if(e.key === "F4") { e.preventDefault(); showMenu("history"); }
+                if(e.key === "F5") { e.preventDefault(); document.getElementById("searchInput").focus(); }
+                if(e.key === "F6") { e.preventDefault(); document.getElementById("nominalInput").focus(); }
+                if(e.key === "F7") { e.preventDefault(); handleSimpanTransaksi(); }
+                if(e.key === "Enter" && currentMenu === "dashboard") {
+                    const active = document.activeElement;
+                    if(active === document.getElementById("searchInput")) {
+                        e.preventDefault();
+                        document.getElementById("nominalInput").focus();
+                    } else if(active === document.getElementById("nominalInput")) {
+                        e.preventDefault();
+                        handleSimpanTransaksi();
+                    }
+                }
+                if(e.key === "Enter" && currentMenu === "members" && document.activeElement === document.getElementById("newMemberName")) {
+                    e.preventDefault();
+                    const name = document.getElementById("newMemberName").value.trim();
+                    if(name) addMember(name);
+                    document.getElementById("newMemberName").value = "";
+                }
+            });
+            
+            refreshAllUI();
+            showMenu("dashboard");
+        });
+    </script>
+</body>
+</html>
